@@ -7,7 +7,7 @@ output:
 
 
 ## Loading and preprocessing the data
-data <- read.csv("activity.csv")/n
+data <- read.csv("activity.csv")
 data$date <- as.Date(data$date, format="%Y-%m-%d")
 
 
@@ -18,10 +18,11 @@ mean.daily.steps <- mean(daily.steps, na.rm = TRUE]
 median.daily.steps <- median(daily.steps, na.rm = TRUE]
 
 ## What is the average daily activity pattern?
-
-
+daily.activity.pattern <- tapply(data$steps, data$interval, FUN = mean, na.rm = TRUE)
+plot(rownames(daily.activity.pattern), daily.activity.pattern, type = "l")
 
 ## Imputing missing values
+total.na <- sum(is.na(data$steps))
 
 
 
