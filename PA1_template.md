@@ -4,11 +4,12 @@
 ## Loading and preprocessing the data
 
 ```r
-temp <- tempfile()
-download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", temp)
+#temp <- tempfile()
+#download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", temp)
 #data <- read.csv("activity.csv")
-data <- read.csv(unz(temp, "activity.csv"))
-unlink(temp)
+data <- read.csv(unz("activity.zip", "activity.csv"))
+#data <- read.csv(unz(temp, "activity.csv"))
+#unlink(temp)
 data$date <- as.Date(data$date, format="%Y-%m-%d")
 ```
 
@@ -31,20 +32,38 @@ cat("Mean Steps per Day is",mean.daily.steps, ".  Median is", median.daily.steps
 ## Mean Steps per Day is 10766.19 .  Median is 10765 .
 ```
 
-```r
-#cat("Median Steps per Day =",median.daily.steps)
-```
-
 ## What is the average daily activity pattern?
 
 ```r
 daily.activity.pattern <- tapply(data$steps, data$interval, FUN = mean, na.rm = TRUE)
-plot(rownames(daily.activity.pattern), daily.activity.pattern, type = "l", ylab = "Mean no. of steps", xlab = "Interval no.")
+plot(rownames(daily.activity.pattern), daily.activity.pattern, type = "l", ylab = "Mean no. of steps", xlab = "Interval")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
+```r
+max_steps <- max(daily.activity.pattern)
+d1 <- as.data.frame(daily.activity.pattern)
+d1$interval <-rownames(d1)
+interval.with.max <- d1$interval[which(d1$daily.activity.pattern==max(d1$daily.activity.pattern))]
+cat("Interval with max no. of steps is", interval.with.max, "with", max_steps, "steps.")
+```
+
+```
+## Interval with max no. of steps is 835 with 206.1698 steps.
+```
+
 ## Imputing missing values
+ 
+The strategy for imputing missing values is by using the within function to substitute the mean for each daily interval for the missing value.
+
+```r
+cat("The number of NA's is", sum(is.na(data$steps)))
+```
+
+```
+## The number of NA's is 2304
+```
 
 ```r
 data2 <- data
@@ -59,19 +78,19 @@ hist(daily.steps2, xlab = "Interval")
 mean.daily.steps2 <- mean(daily.steps2, na.rm = TRUE)
 median.daily.steps2 <- median(daily.steps2, na.rm = TRUE)
 
-cat("Mean adjusted mean steps per Day is",mean.daily.steps2, ".  The previous is ", mean.daily.steps, ".")
+cat("Adjusted mean steps per Day is",mean.daily.steps2, ".  The previous is ", mean.daily.steps, ".")
 ```
 
 ```
-## Mean adjusted mean steps per Day is 10766.19 .  The previous is  10766.19 .
+## Adjusted mean steps per Day is 10766.19 .  The previous is  10766.19 .
 ```
 
 ```r
-cat("Mean adjusted mean steps per Day is",median.daily.steps2, ".  The previous is ", median.daily.steps, ".")
+cat("Adjusted median steps per Day is",median.daily.steps2, ".  The previous is ", median.daily.steps, ".")
 ```
 
 ```
-## Mean adjusted mean steps per Day is 10765 .  The previous is  10765 .
+## Adjusted median steps per Day is 10765 .  The previous is  10765 .
 ```
 
 

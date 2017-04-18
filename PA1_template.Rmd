@@ -11,6 +11,7 @@ output:
 temp <- tempfile()
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", temp)
 #data <- read.csv("activity.csv")
+#data <- read.csv(unz("activity.zip", "activity.csv"))
 data <- read.csv(unz(temp, "activity.csv"))
 unlink(temp)
 data$date <- as.Date(data$date, format="%Y-%m-%d")
@@ -23,17 +24,25 @@ hist(daily.steps, main = "Daily steps histogram", xlab = "Number of daily steps"
 mean.daily.steps <- mean(daily.steps, na.rm = TRUE)
 median.daily.steps <- median(daily.steps, na.rm = TRUE)
 cat("Mean Steps per Day is",mean.daily.steps, ".  Median is", median.daily.steps, ".")
-#cat("Median Steps per Day =",median.daily.steps)
 ```
 
 ## What is the average daily activity pattern?
 ```{r}
 daily.activity.pattern <- tapply(data$steps, data$interval, FUN = mean, na.rm = TRUE)
-plot(rownames(daily.activity.pattern), daily.activity.pattern, type = "l", ylab = "Mean no. of steps", xlab = "Interval no.")
+plot(rownames(daily.activity.pattern), daily.activity.pattern, type = "l", ylab = "Mean no. of steps", xlab = "Interval")
+max_steps <- max(daily.activity.pattern)
+d1 <- as.data.frame(daily.activity.pattern)
+d1$interval <-rownames(d1)
+interval.with.max <- d1$interval[which(d1$daily.activity.pattern==max(d1$daily.activity.pattern))]
+cat("Interval with max no. of steps is", interval.with.max, "with", max_steps, "steps.")
 ```
 
 ## Imputing missing values
+ 
+The strategy for imputing missing values is by using the within function to substitute the mean for each daily interval for the missing value.
 ```{r}
+
+cat("The number of NA's is", sum(is.na(data$steps)))
 data2 <- data
 data2 <- within(data2, steps <- ifelse(is.na(steps), yes = daily.activity.pattern[((interval)/5)+1], no = steps))
 daily.steps2 <- tapply(data$steps, data$date, FUN = sum)
@@ -41,9 +50,9 @@ hist(daily.steps2, xlab = "Interval")
 mean.daily.steps2 <- mean(daily.steps2, na.rm = TRUE)
 median.daily.steps2 <- median(daily.steps2, na.rm = TRUE)
 
-cat("Mean adjusted mean steps per Day is",mean.daily.steps2, ".  The previous is ", mean.daily.steps, ".")
+cat("Adjusted mean steps per Day is",mean.daily.steps2, ".  The previous is ", mean.daily.steps, ".")
 
-cat("Mean adjusted mean steps per Day is",median.daily.steps2, ".  The previous is ", median.daily.steps, ".")
+cat("Adjusted median steps per Day is",median.daily.steps2, ".  The previous is ", median.daily.steps, ".")
 
 ```
 
